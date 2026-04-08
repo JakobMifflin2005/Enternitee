@@ -4,15 +4,25 @@ using UnityEngine;
 
 public class ViewCam : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    static public GameObject POV;
+
+    [Header("Dynamic")]
+
+    public float camZ;
+
+    void Awake()
     {
-        
+        camZ = this.transform.position.z;
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         
+        if(POV == null)return;
+
+        Vector3 destination = POV.transform.position;
+        destination.z = camZ;
+
+        transform.position = destination;
     }
 }
