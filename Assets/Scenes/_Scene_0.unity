@@ -305,6 +305,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!120 &1889153383 stripped
+LineRenderer:
+  m_CorrespondingSourceObject: {fileID: 3734422090642993200, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+  m_PrefabInstance: {fileID: 2633082450995665552}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2107664422
 GameObject:
   m_ObjectHideFlags: 0
@@ -467,6 +472,42 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3734422090642993200, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+      propertyPath: m_UseWorldSpace
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734422090642993200, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+      propertyPath: m_Parameters.alignment
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734422090642993200, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0664fb41266195c4f9bd377a6001ee6e, type: 2}
+    - target: {fileID: 3734422090642993200, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.b
+      value: 0.23529413
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734422090642993200, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.g
+      value: 0.23529413
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734422090642993200, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.r
+      value: 0.23529413
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734422090642993200, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
+      value: 0.19702286
+      objectReference: {fileID: 0}
+    - target: {fileID: 3734422090642993200, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
+      value: 0.48101234
+      objectReference: {fileID: 0}
+    - target: {fileID: 8283781771418472796, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
+      propertyPath: aimLine
+      value: 
+      objectReference: {fileID: 1889153383}
     - target: {fileID: 8283781771418472796, guid: 9ce14ba5a3dd317449b7f77da406cf4b, type: 3}
       propertyPath: mainCam
       value: 

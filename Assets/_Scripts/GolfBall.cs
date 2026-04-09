@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
+[RequireComponent(typeof(LineRenderer))]
 public class GolfBall : MonoBehaviour
 {
+
     public ViewCam viewCam;
     [Header("Swing Settings")]
     public float maxPower = 20f; // The hardest the ball can be hit
@@ -12,6 +13,8 @@ public class GolfBall : MonoBehaviour
     public Camera mainCam;
     public float smoothSpeed = 0.125f;
     private Vector3 cameraOffset;
+    [Header("Visuals")]
+    public LineRenderer aimLine;
     private float currentPower = 0f; // Current power built up during while holding
     private bool isCharging = false;
     private Rigidbody rb;
@@ -24,7 +27,14 @@ public class GolfBall : MonoBehaviour
         // Calculate the initial distance between the ball and camera
         cameraOffset = mainCam.transform.position - transform.position;
         viewCam.target = transform;
-        
+        //Set up the line renderer settings
+        if (aimLine == null)
+        {
+            aimLine = GetComponent<LineRenderer>();
+        }
+        aimLine.positionCount = 2; //Line needs two points: Start and End
+        aimLine.enabled = false; //Hide the line intially
+
     }
 
     void Update()
@@ -34,6 +44,7 @@ public class GolfBall : MonoBehaviour
         {
             isCharging = true;
             currentPower = 0f;
+            aimLine.enabled = true;
         }
 
         // Charge while holding
@@ -41,14 +52,16 @@ public class GolfBall : MonoBehaviour
         {
             currentPower += chargeSpeed * Time.deltaTime;
             currentPower = Mathf.Clamp(currentPower, 0f, maxPower);
+            UpdateAimLine();
             //If player right clicks abort the swing
             if (Input.GetMouseButton(1))
             {
                 isCharging = false;
                 currentPower = 0f;
+                aimLine.enabled = false;
                 Debug.Log("Swing Cancelled");
             }
-              
+
         }
 
         // Shoot when mouse is released
@@ -56,6 +69,7 @@ public class GolfBall : MonoBehaviour
         {
             ShootBall();
             isCharging = false;
+            aimLine.enabled = false;
         }
 
         if (Input.GetKeyDown(KeyCode.C))
@@ -75,19 +89,32 @@ public class GolfBall : MonoBehaviour
                 viewCam.currentMode = ViewCam.CameraMode.Normal;
                 Debug.Log("Switched to Normal mode");
             }
-        } 
+        }
     }
-    // LateUpdate is used to prevent camera Jitter
-    // Runs after the ball has finished its physics movement for the frame
-    
+    void UpdateAimLine()
+    {
+        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            //Calculate the direction same as the ShootBall function
+            Vector3 direction = (transform.position - hit.point);
+            direction.y = 0;
+            direction = direction.normalized;
+            //Point 0 is the ball, Point 1 isa distance away based on power
+            //aimLine.SetPosition(0, transform.position);
+            aimLine.SetPosition(0, transform.position + new Vector3(0, 0.1f, 0));
+            aimLine.SetPosition(1, transform.position + (direction * (currentPower / 2f)));
+        }
+    }
+
     void ShootBall()
     {
-        
+
 
         // Switch to wide shot when you hit the ball
         viewCam.currentMode = ViewCam.CameraMode.WideShot;
 
-        
+
 
         //Create a Ray from the mouse position into the 3D world
         Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
