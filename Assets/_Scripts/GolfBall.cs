@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
+
 public class GolfBall : MonoBehaviour
 {
+    public ViewCam viewCam;
     [Header("Swing Settings")]
     public float maxPower = 20f; // The hardest the ball can be hit
     public float chargeSpeed = 10f; // How fast the powerball fills up
@@ -20,6 +23,8 @@ public class GolfBall : MonoBehaviour
         if (mainCam == null) mainCam = Camera.main;
         // Calculate the initial distance between the ball and camera
         cameraOffset = mainCam.transform.position - transform.position;
+        viewCam.target = transform;
+        
     }
 
     void Update()
@@ -43,6 +48,7 @@ public class GolfBall : MonoBehaviour
                 currentPower = 0f;
                 Debug.Log("Swing Cancelled");
             }
+              
         }
 
         // Shoot when mouse is released
@@ -51,19 +57,38 @@ public class GolfBall : MonoBehaviour
             ShootBall();
             isCharging = false;
         }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            if (viewCam.currentMode == ViewCam.CameraMode.Normal)
+            {
+                viewCam.currentMode = ViewCam.CameraMode.WideShot;
+                Debug.Log("Switched to WideShot mode");
+            }
+            else if (viewCam.currentMode == ViewCam.CameraMode.WideShot)
+            {
+                viewCam.currentMode = ViewCam.CameraMode.Course;
+                Debug.Log("Switched to Course mode");
+            }
+            else
+            {
+                viewCam.currentMode = ViewCam.CameraMode.Normal;
+                Debug.Log("Switched to Normal mode");
+            }
+        } 
     }
     // LateUpdate is used to prevent camera Jitter
     // Runs after the ball has finished its physics movement for the frame
-    void LateUpdate()
-    {
-        // Move the camera to the ball's current position + the original offset
-        Vector3 desiredPosition = transform.position + cameraOffset;
-
-        // Smoothly move the camera
-        mainCam.transform.position = Vector3.Lerp(mainCam.transform.position, desiredPosition, smoothSpeed);
-    }
+    
     void ShootBall()
     {
+        
+
+        // Switch to wide shot when you hit the ball
+        viewCam.currentMode = ViewCam.CameraMode.WideShot;
+
+        
+
         //Create a Ray from the mouse position into the 3D world
         Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -94,24 +119,8 @@ public class GolfBall : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
         //Not avaible right now but it should pop up scoreboard
         //And go on to the next level for now it'll just reload the same level
-        //SceneManager.LoadScene(_Scene_0);
+        SceneManager.LoadScene("_Scene_0");
     }
+
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
