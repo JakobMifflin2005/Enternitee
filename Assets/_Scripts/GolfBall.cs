@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class GolfBall : MonoBehaviour
 {
     [Header("Swing Settings")]
@@ -78,4 +78,40 @@ public class GolfBall : MonoBehaviour
             rb.AddForce(direction * currentPower, ForceMode.Impulse);
         }
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        //Check if the Object we hit has the hole tag
+        if (other.CompareTag("Hole"))
+        {
+            Debug.Log("GOAL! Ball entered the hole");
+            HandleGoal();
+        }
+    }
+    void HandleGoal()
+    {
+        //Stop the ball from moving forward
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        //Not avaible right now but it should pop up scoreboard
+        //And go on to the next level for now it'll just reload the same level
+        //SceneManager.LoadScene(_Scene_0);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
