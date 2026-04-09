@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using TMPro;
 [RequireComponent(typeof(LineRenderer))]
 public class GolfBall : MonoBehaviour
 {
@@ -15,8 +15,10 @@ public class GolfBall : MonoBehaviour
     private Vector3 cameraOffset;
     [Header("Visuals")]
     public LineRenderer aimLine;
+    public TextMeshProUGUI scoreText;
     private float currentPower = 0f; // Current power built up during while holding
     private bool isCharging = false;
+    private int strokeCount = 0;
     private Rigidbody rb;
 
     void Start()
@@ -34,6 +36,7 @@ public class GolfBall : MonoBehaviour
         }
         aimLine.positionCount = 2; //Line needs two points: Start and End
         aimLine.enabled = false; //Hide the line intially
+        UpdateScoreUI();
 
     }
 
@@ -128,6 +131,8 @@ public class GolfBall : MonoBehaviour
             direction = direction.normalized;
             //Apply the force as an Impulse
             rb.AddForce(direction * currentPower, ForceMode.Impulse);
+            strokeCount++;
+            UpdateScoreUI();
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -148,6 +153,12 @@ public class GolfBall : MonoBehaviour
         //And go on to the next level for now it'll just reload the same level
         SceneManager.LoadScene("_Scene_0");
     }
-
+    void UpdateScoreUI()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = "Strokes: " + strokeCount;
+        }
+    }
 
 }
