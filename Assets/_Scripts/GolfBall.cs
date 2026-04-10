@@ -1,9 +1,13 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections;
+
 [RequireComponent(typeof(LineRenderer))]
 public class GolfBall : MonoBehaviour
 {
+    private Vector3 lastSafePosition;
+    private bool isRespawning = false;
 
     public ViewCam viewCam;
     [Header("Swing Settings")]
@@ -42,9 +46,12 @@ public class GolfBall : MonoBehaviour
 
     void Update()
     {
+        
         // Start charging when mouse is pressed
         if (Input.GetMouseButtonDown(0))
         {
+            
+
             isCharging = true;
             currentPower = 0f;
             aimLine.enabled = true;
@@ -93,6 +100,10 @@ public class GolfBall : MonoBehaviour
                 Debug.Log("Switched to Normal mode");
             }
         }
+        if (rb.velocity.magnitude < 0.1f && !isRespawning)
+        {
+            lastSafePosition = transform.position;
+        }
     }
     void UpdateAimLine()
     {
@@ -108,6 +119,42 @@ public class GolfBall : MonoBehaviour
             aimLine.SetPosition(0, transform.position + new Vector3(0, 0.1f, 0));
             aimLine.SetPosition(1, transform.position + (direction * (currentPower / 2f)));
         }
+    }
+    public void FallIntoPit()
+    {
+        StartCoroutine(FallRoutine());
+    }
+    IEnumerator FallRoutine()
+    {
+        isRespawning = true;
+
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
+
+        Vector3 originalScale = transform.localScale;
+
+        float t = 0f;
+        float duration = 0.4f;
+
+        // shrink effect
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            float scale = Mathf.Lerp(1f, 0f, t / duration);
+            transform.localScale = originalScale * scale;
+            yield return null;
+        }
+
+        // respawn
+        transform.position = lastSafePosition + Vector3.up * 0.5f;
+
+        // restore
+        transform.localScale = originalScale;
+        rb.isKinematic = false;
+        rb.velocity = Vector3.zero;
+
+        isRespawning = false;
     }
 
     void ShootBall()
