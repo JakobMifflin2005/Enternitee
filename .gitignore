@@ -78,3 +78,18 @@ crashlytics-build.properties
 
 # Krita crash/autosave files (do not commit)
 *.kra-autosave.kra
+/Packages
+connectwebgl.zip
+/Packages
+Packages/manifest.json
+/Packages
+/WebGL Builds/Build
+/WebGL Builds
+webgl_sharing
+/Packages
+*.json
+Packages/manifest.json
+Packages/manifest.json
+/Packages
+ProjectSettings/EditorBuildSettings.asset
+ProjectSettings/ProjectSettings.asset

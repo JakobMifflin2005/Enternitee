@@ -8,7 +8,6 @@ public class GolfBall : MonoBehaviour
 {
     private Vector3 lastSafePosition;
     private bool isRespawning = false;
-
     public ViewCam viewCam;
     [Header("Swing Settings")]
     public float maxPower = 20f; // The hardest the ball can be hit
@@ -19,39 +18,35 @@ public class GolfBall : MonoBehaviour
     private Vector3 cameraOffset;
     [Header("Visuals")]
     public LineRenderer aimLine;
-    public TextMeshProUGUI scoreText;
     private float currentPower = 0f; // Current power built up during while holding
     private bool isCharging = false;
-    private int strokeCount = 0;
     private Rigidbody rb;
-
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        if (aimLine == null)
+        {
+            aimLine = GetComponent<LineRenderer>();
+        }
+    }
+    void Start()
+    {
         // If you didn't assign the camera in the inspector, find it automatically
         if (mainCam == null) mainCam = Camera.main;
         // Calculate the initial distance between the ball and camera
         cameraOffset = mainCam.transform.position - transform.position;
         viewCam.target = transform;
         //Set up the line renderer settings
-        if (aimLine == null)
-        {
-            aimLine = GetComponent<LineRenderer>();
-        }
         aimLine.positionCount = 2; //Line needs two points: Start and End
         aimLine.enabled = false; //Hide the line intially
-        UpdateScoreUI();
-
     }
 
     void Update()
     {
-        
+
         // Start charging when mouse is pressed
         if (Input.GetMouseButtonDown(0))
         {
-            
-
             isCharging = true;
             currentPower = 0f;
             aimLine.enabled = true;
@@ -159,13 +154,8 @@ public class GolfBall : MonoBehaviour
 
     void ShootBall()
     {
-
-
         // Switch to wide shot when you hit the ball
         viewCam.currentMode = ViewCam.CameraMode.WideShot;
-
-
-
         //Create a Ray from the mouse position into the 3D world
         Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -178,8 +168,10 @@ public class GolfBall : MonoBehaviour
             direction = direction.normalized;
             //Apply the force as an Impulse
             rb.AddForce(direction * currentPower, ForceMode.Impulse);
-            strokeCount++;
-            UpdateScoreUI();
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.RegisterStroke();
+            }
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -188,24 +180,30 @@ public class GolfBall : MonoBehaviour
         if (other.CompareTag("Hole"))
         {
             Debug.Log("GOAL! Ball entered the hole");
-            HandleGoal();
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ComputeHole();
+            }
         }
     }
-    void HandleGoal()
+    public void ResetBallForNewLevel(Vector3 spawnPosition)
     {
-        //Stop the ball from moving forward
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody>();
+        }
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        //Not avaible right now but it should pop up scoreboard
-        //And go on to the next level for now it'll just reload the same level
-        SceneManager.LoadScene("_Scene_0");
-    }
-    void UpdateScoreUI()
-    {
-        if (scoreText != null)
+        rb.isKinematic = false;
+        transform.position = spawnPosition;
+        lastSafePosition = spawnPosition;
+        currentPower = 0f;
+        isCharging = false;
+        if (aimLine != null)
         {
-            scoreText.text = "Strokes: " + strokeCount;
+            aimLine.enabled = false;
         }
     }
-
 }
