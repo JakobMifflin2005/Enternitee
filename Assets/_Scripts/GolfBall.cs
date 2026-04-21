@@ -7,6 +7,11 @@ using System.Collections;
 public class GolfBall : MonoBehaviour
 {
     private Vector3 lastSafePosition;
+    private float terrainMultiplier = 1f;
+
+    
+    private float enterRough = 0f;
+
     private bool isRespawning = false;
     public ViewCam viewCam;
     [Header("Swing Settings")]
@@ -20,7 +25,7 @@ public class GolfBall : MonoBehaviour
     public LineRenderer aimLine;
     private float currentPower = 0f; // Current power built up during while holding
     private bool isCharging = false;
-    private Rigidbody rb;
+    public Rigidbody rb;
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -167,7 +172,7 @@ public class GolfBall : MonoBehaviour
             direction.y = 0f;
             direction = direction.normalized;
             //Apply the force as an Impulse
-            rb.AddForce(direction * currentPower, ForceMode.Impulse);
+            rb.AddForce(direction * currentPower * terrainMultiplier, ForceMode.Impulse);
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.RegisterStroke();
@@ -187,6 +192,39 @@ public class GolfBall : MonoBehaviour
                 GameManager.Instance.ComputeHole();
             }
         }
+        if (other.CompareTag("Rough"))
+        {
+            Debug.Log("Ball shot power reduced");
+            terrainMultiplier = .5f;
+            if (enterRough == 0f)
+            {
+                rb.velocity *=  .5f;
+                enterRough =1;
+            }
+            
+        }
+
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        //Check if the Object we hit has the hole tag
+        
+        if (other.CompareTag("Rough"))
+        {
+            terrainMultiplier = .5f;
+        }
+
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        //Check if the Object we hit has the hole tag
+        
+        if (other.CompareTag("Rough"))
+        {
+            terrainMultiplier = 1f;
+            enterRough = 0f;
+        }
+
     }
     public void ResetBallForNewLevel(Vector3 spawnPosition)
     {
