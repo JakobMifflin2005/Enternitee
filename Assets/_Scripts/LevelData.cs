@@ -6,4 +6,5 @@ public class LevelData : MonoBehaviour
 {
     public int par = 4;
     public Transform ballSpawnPoint;
+    public Transform courseTarget;
 }

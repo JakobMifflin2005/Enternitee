@@ -33,7 +33,7 @@ public class ViewCam : MonoBehaviour
         // Decide which height to use
         float height = normalHeight;
         float size = normalSize;
-        switch(currentMode)
+        switch (currentMode)
         {
             case CameraMode.Normal: height = normalHeight; size = normalSize; break;
             case CameraMode.WideShot: height = wideShotHeight; size = wideShotSize; break;
@@ -57,5 +57,11 @@ public class ViewCam : MonoBehaviour
         {
             cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, size, smoothSpeed);
         }
+    }
+    public void SetTargets(Transform ballTarget, Transform levelCourseTarget)
+    {
+        target = ballTarget;
+        courseTarget = levelCourseTarget;
+        currentMode = CameraMode.Normal;
     }
 }

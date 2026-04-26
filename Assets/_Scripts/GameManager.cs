@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
             return 4;
         }
     }
+    public ViewCam viewCam;
     void Awake()
     {
         if (Instance == null)
@@ -76,9 +77,13 @@ public class GameManager : MonoBehaviour
         {
             Destroy(activeLevel);
         }
-        activeLevel = Instantiate(levels[currentLevelIndex], new Vector3(-190f, 0f, 0f), Quaternion.identity);
+        activeLevel = Instantiate(levels[currentLevelIndex], Vector3.zero, Quaternion.identity);
         currentLevelData = activeLevel.GetComponent<LevelData>();
         strokeCount = 0;
+        if (viewCam != null && golfBall != null && currentLevelData != null)
+        {
+            viewCam.SetTargets(golfBall.transform, currentLevelData.courseTarget);
+        }
         if (golfBall != null)
         {
             golfBall.ResetBallForNewLevel(GetSpawnPosition());

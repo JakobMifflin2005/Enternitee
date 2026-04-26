@@ -9,7 +9,7 @@ public class GolfBall : MonoBehaviour
     private Vector3 lastSafePosition;
     private float terrainMultiplier = 1f;
 
-    
+
     private float enterRough = 0f;
 
     private bool isRespawning = false;
@@ -50,7 +50,7 @@ public class GolfBall : MonoBehaviour
     {
 
         // Start charging when mouse is pressed
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && CanShoot())
         {
             isCharging = true;
             currentPower = 0f;
@@ -75,7 +75,7 @@ public class GolfBall : MonoBehaviour
         }
 
         // Shoot when mouse is released
-        if (Input.GetMouseButtonUp(0) && isCharging)
+        if (Input.GetMouseButtonUp(0) && isCharging && CanShoot())
         {
             ShootBall();
             isCharging = false;
@@ -198,17 +198,17 @@ public class GolfBall : MonoBehaviour
             terrainMultiplier = .5f;
             if (enterRough == 0f)
             {
-                rb.velocity *=  .5f;
-                enterRough =1;
+                rb.velocity *= .5f;
+                enterRough = 1;
             }
-            
+
         }
 
     }
     private void OnTriggerStay(Collider other)
     {
         //Check if the Object we hit has the hole tag
-        
+
         if (other.CompareTag("Rough"))
         {
             terrainMultiplier = .5f;
@@ -218,13 +218,18 @@ public class GolfBall : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         //Check if the Object we hit has the hole tag
-        
+
         if (other.CompareTag("Rough"))
         {
             terrainMultiplier = 1f;
             enterRough = 0f;
         }
 
+    }
+    //This is so the ball cant be shot when its moving
+    bool CanShoot()
+    {
+        return rb.velocity.magnitude < 0.1f && !isRespawning;
     }
     public void ResetBallForNewLevel(Vector3 spawnPosition)
     {
