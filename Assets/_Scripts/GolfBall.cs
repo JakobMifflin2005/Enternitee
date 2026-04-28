@@ -8,6 +8,23 @@ public class GolfBall : MonoBehaviour
 {
     private Vector3 lastSafePosition;
     private float terrainMultiplier = 1f;
+    public PowerUpType? storedPowerUp = null;
+    private float storedValue;
+    private bool waitingForPracticeReset = false;
+    
+    private Vector3 resultPos1;
+    private Vector3 resultPos2;
+    public float powerMultiplier = 1f;
+
+    // One-time effects
+    private bool practiceShotActive = false;
+    private bool doubleShotActive = false;
+    private bool awaitingSecondShot = false;
+
+    private bool choosingBall = false;
+    public GameObject resultBallPrefab;
+    private Vector3 firstShotPosition;
+    private Vector3 secondShotPosition;
 
 
     private float enterRough = 0f;
@@ -48,6 +65,36 @@ public class GolfBall : MonoBehaviour
 
     void Update()
     {
+        if (choosingBall)
+        {
+            HandleBallChoice();
+            return;
+        }
+        // Input for using power ups 
+
+        if (Input.GetKeyDown(KeyCode.P) && storedPowerUp != null)
+        {
+            ActivateStoredPowerUp();
+        }
+
+        // required for practice shot, will reset when it stopps fully
+        if (waitingForPracticeReset)
+        {
+
+            Debug.Log("[PracticeShot] speed = " + rb.velocity.magnitude);
+
+            if (rb.velocity.magnitude < 0.05f)
+            {
+                Debug.Log("[PracticeShot] BALL STOPPED → RESETTING");
+
+                waitingForPracticeReset = false;
+
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+
+                transform.position = lastSafePosition;
+            }
+        }
 
         // Start charging when mouse is pressed
         if (Input.GetMouseButtonDown(0) && CanShoot())
@@ -100,7 +147,8 @@ public class GolfBall : MonoBehaviour
                 Debug.Log("Switched to Normal mode");
             }
         }
-        if (rb.velocity.magnitude < 0.1f && !isRespawning)
+        //adjust for practice shot to make it easier for it to reset
+        if (rb.velocity.magnitude < 0.1f && !isRespawning && !waitingForPracticeReset)
         {
             lastSafePosition = transform.position;
         }
@@ -171,14 +219,162 @@ public class GolfBall : MonoBehaviour
             Vector3 direction = transform.position - hit.point;
             direction.y = 0f;
             direction = direction.normalized;
-            //Apply the force as an Impulse
-            rb.AddForce(direction * currentPower * terrainMultiplier, ForceMode.Impulse);
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.RegisterStroke();
-            }
+            //added new Function for shot to apply power ups on.
+            HandleShot(direction, currentPower * terrainMultiplier);
+           
         }
     }
+    void HandleShot(Vector3 direction, float power)
+    {
+        Debug.Log("[HandleShot] practiceShotActive = " + practiceShotActive);
+        Debug.Log("[HandleShot] doubleShotActive = " + doubleShotActive);
+        Debug.Log("[HandleShot] power = " + power);
+        power *= powerMultiplier;
+
+        if (practiceShotActive)
+        {
+            // starts practice function for powerup
+            StartCoroutine(PracticeShotRoutine(direction, power));
+        }
+        else if (doubleShotActive)
+        {
+            // starts doubleShot function for powerup
+            StartCoroutine(DoubleShotRoutine(direction, power));
+        }
+        if (awaitingSecondShot)
+        {
+            // lets you choose a new direction and power for second shot
+            awaitingSecondShot = false;
+
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            rb.AddForce(direction * power, ForceMode.Impulse);
+
+            GameManager.Instance?.RegisterStroke();
+
+            StartCoroutine(FinishSecondShot());
+            return;
+        }
+        
+        rb.AddForce(direction * power, ForceMode.Impulse);
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RegisterStroke();
+        }
+    
+        ResetOneShotEffects();
+    }
+
+    IEnumerator PracticeShotRoutine(Vector3 direction, float power)
+    {
+        Debug.Log("[PracticeShot] Coroutine STARTED");
+        practiceShotActive = false;
+        rb.AddForce(direction * power*.1f, ForceMode.Impulse);
+        yield return new WaitForSeconds(2f);
+        waitingForPracticeReset = true;
+        Debug.Log("[PracticeShot] waitingForPracticeReset = TRUE");
+        yield return null;
+    }
+    //shoots the first shot for double shot dropping off a result ball when it stops fully
+    IEnumerator DoubleShotRoutine(Vector3 direction, float power)
+    {
+        doubleShotActive = false;
+
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        rb.AddForce(direction * power  *.2f, ForceMode.Impulse);
+        yield return new WaitForSeconds(2f);
+
+        yield return new WaitUntil(() =>
+            rb.velocity.magnitude < 0.2f
+        );
+
+        CreateResultBall(transform.position, 1);
+
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        rb.position = lastSafePosition;
+
+        yield return new WaitForFixedUpdate();
+
+        awaitingSecondShot = true;
+
+        Debug.Log("Ready for second shot input");
+    }
+    // loads up second shot for double shot
+    IEnumerator FinishSecondShot()
+    {
+        yield return new WaitForSeconds(2f);
+        yield return new WaitUntil(() =>
+            rb.velocity.magnitude < 0.2f
+        );
+
+        CreateResultBall(transform.position, 2);
+
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        rb.position = lastSafePosition;
+        viewCam.currentMode = ViewCam.CameraMode.Course;
+        Debug.Log("Switched to Course mode");
+        choosingBall = true;
+
+        Debug.Log("[DoubleShot] Selection enabled");
+    }
+    // will let you pick which ball to choose from with pressing 1 or 2
+    void HandleBallChoice()
+    {
+          if (!choosingBall) return;
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            SelectResult(resultPos1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            SelectResult(resultPos2);
+        }
+    
+    }
+    void CreateResultBall(Vector3 pos, int index)
+    {
+        //creates a ball when the ball stops for double shot for you pick with numbers
+         GameObject ball = Instantiate(resultBallPrefab, pos, Quaternion.identity);
+
+        GolfResultBall script = ball.GetComponent<GolfResultBall>();
+        script.shotIndex = index; // gives them the number
+
+        ball.tag = "ResultBall";
+        if (index == 1)
+            resultPos1 = pos;
+        else if (index == 2)
+            resultPos2 = pos;
+    }
+
+    //shifts the original ball to that position of the result ball chosen.
+    void SelectResult(Vector3 pos)
+    {
+
+        Debug.Log("Selected result at: " + pos);
+
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        rb.position = pos;
+        viewCam.currentMode = ViewCam.CameraMode.WideShot;
+
+        foreach (GameObject r in GameObject.FindGameObjectsWithTag("ResultBall"))
+            Destroy(r);
+
+        choosingBall = false;
+        awaitingSecondShot = false;
+    }
+    
     private void OnTriggerEnter(Collider other)
     {
         //Check if the Object we hit has the hole tag
@@ -205,6 +401,8 @@ public class GolfBall : MonoBehaviour
         }
 
     }
+    
+
     private void OnTriggerStay(Collider other)
     {
         //Check if the Object we hit has the hole tag
@@ -231,6 +429,9 @@ public class GolfBall : MonoBehaviour
     {
         return rb.velocity.magnitude < 0.1f && !isRespawning;
     }
+    
+    
+
     public void ResetBallForNewLevel(Vector3 spawnPosition)
     {
         if (rb == null)
@@ -248,5 +449,51 @@ public class GolfBall : MonoBehaviour
         {
             aimLine.enabled = false;
         }
+    }
+    // stores up power up type and value
+
+
+    public void StorePowerUp(PowerUpType type, float value )
+    {
+        storedPowerUp = type;
+        storedValue = value;
+    }
+    // gets rid of power up
+    void ActivateStoredPowerUp()
+    {
+        ApplyPowerUp(storedPowerUp.Value, storedValue);
+        storedPowerUp = null;
+    }
+    //applies different power up types, haven't done Jeb as that subtracts stroke count 
+    void ApplyPowerUp(PowerUpType type, float value)
+    {
+        Debug.Log("Activated: " + type);
+        switch (type)
+        {
+            case PowerUpType.EmpowerBoost:
+                powerMultiplier = value;
+                Debug.Log("Power multiplier set to: " + powerMultiplier);
+                break;
+
+            case PowerUpType.Jeb:
+                break;
+
+            case PowerUpType.PracticeShot:
+                powerMultiplier = 1f;
+                Debug.Log("[PracticeShot] FLAG SET = TRUE");
+                practiceShotActive = true;
+                break;
+
+            case PowerUpType.DoubleShot:
+                powerMultiplier = 1f;
+                doubleShotActive = true;
+                break;
+        }
+    }
+    void ResetOneShotEffects()
+    {
+        powerMultiplier = 1f;
+
+    
     }
 }

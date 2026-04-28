@@ -20,6 +20,7 @@ public class HoleResult
 }
 public class GameManager : MonoBehaviour
 {
+ int x = 0;
     public static GameManager Instance;
     [Header("Level Managment")]
     public GameObject[] levels;
@@ -81,7 +82,9 @@ public class GameManager : MonoBehaviour
         currentLevelData = activeLevel.GetComponent<LevelData>();
         strokeCount = 0;
         if (viewCam != null && golfBall != null && currentLevelData != null)
-        {
+        { 
+            x =1; 
+            x= 0;
             viewCam.SetTargets(golfBall.transform, currentLevelData.courseTarget);
         }
         if (golfBall != null)

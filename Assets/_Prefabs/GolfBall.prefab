@@ -128,12 +128,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52b2e6ee25ad68d4aac45e4371e76206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  powerMultiplier: 1
+  resultBallPrefab: {fileID: 2633082451551341487, guid: e4ff5003244a2e94984f0fc53d28bddd, type: 3}
   viewCam: {fileID: 0}
   maxPower: 25
   chargeSpeed: 10
   mainCam: {fileID: 0}
   smoothSpeed: 0.125
   aimLine: {fileID: 3734422090642993200}
+  rb: {fileID: 0}
 --- !u!120 &3734422090642993200
 LineRenderer:
   m_ObjectHideFlags: 0
