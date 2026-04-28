@@ -64,4 +64,5 @@ public class ViewCam : MonoBehaviour
         courseTarget = levelCourseTarget;
         currentMode = CameraMode.Normal;
     }
+    
 }
