@@ -705,6 +705,7 @@ MonoBehaviour:
   totalScoreText: {fileID: 2023937621}
   parText: {fileID: 1968155453}
   holeText: {fileID: 1793701386}
+  viewCam: {fileID: 2107664426}
 --- !u!4 &1854455721
 Transform:
   m_ObjectHideFlags: 0
