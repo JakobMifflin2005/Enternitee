@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 [System.Serializable]
 public class HoleResult
@@ -34,6 +35,8 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI totalScoreText;
     public TextMeshProUGUI parText;
     public TextMeshProUGUI holeText;
+    public Text powerUpHolder;
+    
     private int strokeCount = 0;
     private int totalScoreRelativeToPar = 0;
     private List<HoleResult> holeResults = new List<HoleResult>();
@@ -97,6 +100,22 @@ public class GameManager : MonoBehaviour
     {
         strokeCount++;
         UpdateUI();
+    }
+    public void InsertPowerUpText(string msg)
+    {
+    
+        powerUpHolder.text = msg;
+    }
+    public void RemovePowerUpText()
+    {
+        powerUpHolder.text = "Empty";
+    }
+    public void RemoveStroke()
+    {
+        if (strokeCount >0){
+        strokeCount--;
+        UpdateUI();
+        }
     }
     public void ComputeHole()
     {

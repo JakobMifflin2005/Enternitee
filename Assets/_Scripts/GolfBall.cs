@@ -251,14 +251,17 @@ public class GolfBall : MonoBehaviour
 
             rb.AddForce(direction * power, ForceMode.Impulse);
 
-            GameManager.Instance?.RegisterStroke();
+            GameManager.Instance.RegisterStroke();
 
             StartCoroutine(FinishSecondShot());
             return;
         }
-        
-        rb.AddForce(direction * power, ForceMode.Impulse);
 
+        if(!practiceShotActive && !doubleShotActive){
+            rb.AddForce(direction * power, ForceMode.Impulse);
+
+            
+        }
         if (GameManager.Instance != null)
         {
             GameManager.Instance.RegisterStroke();
@@ -271,10 +274,13 @@ public class GolfBall : MonoBehaviour
     {
         Debug.Log("[PracticeShot] Coroutine STARTED");
         practiceShotActive = false;
-        rb.AddForce(direction * power*.1f, ForceMode.Impulse);
+        GameManager.Instance.RemoveStroke();
+
+        
         yield return new WaitForSeconds(2f);
         waitingForPracticeReset = true;
         Debug.Log("[PracticeShot] waitingForPracticeReset = TRUE");
+
         yield return null;
     }
     //shoots the first shot for double shot dropping off a result ball when it stops fully
@@ -282,10 +288,12 @@ public class GolfBall : MonoBehaviour
     {
         doubleShotActive = false;
 
+
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-        rb.AddForce(direction * power  *.2f, ForceMode.Impulse);
+      
+        GameManager.Instance.RemoveStroke();
         yield return new WaitForSeconds(2f);
 
         yield return new WaitUntil(() =>
@@ -383,6 +391,8 @@ public class GolfBall : MonoBehaviour
             Debug.Log("GOAL! Ball entered the hole");
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
+            storedPowerUp = null;
+            storedValue =1;
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.ComputeHole();
@@ -457,12 +467,29 @@ public class GolfBall : MonoBehaviour
     {
         storedPowerUp = type;
         storedValue = value;
+        if( storedPowerUp == PowerUpType.EmpowerBoost)
+        {
+             GameManager.Instance.InsertPowerUpText("Empower Shot");
+        }
+        if( storedPowerUp == PowerUpType.PracticeShot)
+        {
+             GameManager.Instance.InsertPowerUpText("Practice Shot");
+        }
+        if( storedPowerUp == PowerUpType.DoubleShot)
+        {
+             GameManager.Instance.InsertPowerUpText("Double Shot");
+        }
+        if( storedPowerUp == PowerUpType.Jeb)
+        {
+             GameManager.Instance.InsertPowerUpText("Jeb");
+        }
     }
     // gets rid of power up
     void ActivateStoredPowerUp()
     {
         ApplyPowerUp(storedPowerUp.Value, storedValue);
         storedPowerUp = null;
+        GameManager.Instance.RemovePowerUpText();
     }
     //applies different power up types, haven't done Jeb as that subtracts stroke count 
     void ApplyPowerUp(PowerUpType type, float value)
@@ -476,6 +503,9 @@ public class GolfBall : MonoBehaviour
                 break;
 
             case PowerUpType.Jeb:
+                GameManager.Instance.RemoveStroke();
+                GameManager.Instance.RemoveStroke();
+
                 break;
 
             case PowerUpType.PracticeShot:

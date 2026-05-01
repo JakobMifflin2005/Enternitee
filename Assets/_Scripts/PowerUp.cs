@@ -13,7 +13,7 @@ public class PowerUp : MonoBehaviour
      void Start()
     {
         cube = transform.GetChild(0).gameObject;
-        // Random rotation speed like your example
+        // Random rotation speed like your example in the book for power ups 
         rotPerSecond = new Vector3(
             Random.Range(15f, 90f),
             Random.Range(15f, 90f),
