@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI parText;
     public TextMeshProUGUI holeText;
     public Text powerUpHolder;
+    public Text powerUpInstruct;
     
     private int strokeCount = 0;
     private int totalScoreRelativeToPar = 0;
@@ -52,6 +53,7 @@ public class GameManager : MonoBehaviour
         }
     }
     public ViewCam viewCam;
+
     void Awake()
     {
         if (Instance == null)
@@ -100,6 +102,16 @@ public class GameManager : MonoBehaviour
     {
         strokeCount++;
         UpdateUI();
+    }
+    public void InsertPowerUpInstruct(string msg)
+    {
+    
+        powerUpInstruct.text = msg;
+    }
+    public void RemovePowerUpInstruct()
+    {
+    
+        powerUpInstruct.text = "";
     }
     public void InsertPowerUpText(string msg)
     {

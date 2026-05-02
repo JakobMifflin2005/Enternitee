@@ -7,9 +7,12 @@ using System.Collections;
 public class GolfBall : MonoBehaviour
 {
     private Vector3 lastSafePosition;
+    // for rough
     private float terrainMultiplier = 1f;
+    //for poer up types
     public PowerUpType? storedPowerUp = null;
     private float storedValue;
+    // to give time for it to rest.
     private bool waitingForPracticeReset = false;
     
     private Vector3 resultPos1;
@@ -19,17 +22,19 @@ public class GolfBall : MonoBehaviour
     // One-time effects
     private bool practiceShotActive = false;
     private bool doubleShotActive = false;
+    //boolean for seeing if we can take a second shot
     private bool awaitingSecondShot = false;
-
+    //boolean for choosing
     private bool choosingBall = false;
     public GameObject resultBallPrefab;
+    //positions for both result balls
     private Vector3 firstShotPosition;
     private Vector3 secondShotPosition;
 
 
     private float enterRough = 0f;
 
-    private bool isRespawning = false;
+    private bool isRespawning = false; // Checking for pit fall
     public ViewCam viewCam;
     [Header("Swing Settings")]
     public float maxPower = 20f; // The hardest the ball can be hit
@@ -381,6 +386,7 @@ public class GolfBall : MonoBehaviour
 
         choosingBall = false;
         awaitingSecondShot = false;
+        GameManager.Instance.RemovePowerUpInstruct();
     }
     
     private void OnTriggerEnter(Collider other)
@@ -515,6 +521,7 @@ public class GolfBall : MonoBehaviour
                 break;
 
             case PowerUpType.DoubleShot:
+                GameManager.Instance.InsertPowerUpInstruct("Press 1 or 2 to Choose");
                 powerMultiplier = 1f;
                 doubleShotActive = true;
                 break;
