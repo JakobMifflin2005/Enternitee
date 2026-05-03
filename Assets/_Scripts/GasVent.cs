@@ -6,6 +6,8 @@ public class GasVent : MonoBehaviour
 {
     private WindBox windBox;
     private Renderer windVisibility;
+    public float startDelay = 0f;
+
 
     public float intervalTimeOne = 5f;
     public float intervalTimeTwo = 5f;
@@ -19,6 +21,8 @@ public class GasVent : MonoBehaviour
     }
     IEnumerator WindInterval()
     {
+        //allows stagger
+        yield return new WaitForSeconds(startDelay);
         // starts looping on and off
         // still need to make wind invisible when turned off
         
