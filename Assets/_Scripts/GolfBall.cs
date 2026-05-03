@@ -14,7 +14,7 @@ public class GolfBall : MonoBehaviour
     private float storedValue;
     // to give time for it to rest.
     private bool waitingForPracticeReset = false;
-    
+
     private Vector3 resultPos1;
     private Vector3 resultPos2;
     public float powerMultiplier = 1f;
@@ -226,7 +226,7 @@ public class GolfBall : MonoBehaviour
             direction = direction.normalized;
             //added new Function for shot to apply power ups on.
             HandleShot(direction, currentPower * terrainMultiplier);
-           
+
         }
     }
     void HandleShot(Vector3 direction, float power)
@@ -262,16 +262,17 @@ public class GolfBall : MonoBehaviour
             return;
         }
 
-        if(!practiceShotActive && !doubleShotActive){
+        if (!practiceShotActive && !doubleShotActive)
+        {
             rb.AddForce(direction * power, ForceMode.Impulse);
 
-            
+
         }
         if (GameManager.Instance != null)
         {
             GameManager.Instance.RegisterStroke();
         }
-    
+
         ResetOneShotEffects();
     }
 
@@ -281,7 +282,7 @@ public class GolfBall : MonoBehaviour
         practiceShotActive = false;
         GameManager.Instance.RemoveStroke();
 
-        
+
         yield return new WaitForSeconds(2f);
         waitingForPracticeReset = true;
         Debug.Log("[PracticeShot] waitingForPracticeReset = TRUE");
@@ -297,7 +298,7 @@ public class GolfBall : MonoBehaviour
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-      
+
         GameManager.Instance.RemoveStroke();
         yield return new WaitForSeconds(2f);
 
@@ -341,7 +342,7 @@ public class GolfBall : MonoBehaviour
     // will let you pick which ball to choose from with pressing 1 or 2
     void HandleBallChoice()
     {
-          if (!choosingBall) return;
+        if (!choosingBall) return;
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -352,12 +353,12 @@ public class GolfBall : MonoBehaviour
         {
             SelectResult(resultPos2);
         }
-    
+
     }
     void CreateResultBall(Vector3 pos, int index)
     {
         //creates a ball when the ball stops for double shot for you pick with numbers
-         GameObject ball = Instantiate(resultBallPrefab, pos, Quaternion.identity);
+        GameObject ball = Instantiate(resultBallPrefab, pos, Quaternion.identity);
 
         GolfResultBall script = ball.GetComponent<GolfResultBall>();
         script.shotIndex = index; // gives them the number
@@ -388,7 +389,7 @@ public class GolfBall : MonoBehaviour
         awaitingSecondShot = false;
         GameManager.Instance.RemovePowerUpInstruct();
     }
-    
+
     private void OnTriggerEnter(Collider other)
     {
         //Check if the Object we hit has the hole tag
@@ -398,7 +399,7 @@ public class GolfBall : MonoBehaviour
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             storedPowerUp = null;
-            storedValue =1;
+            storedValue = 1;
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.ComputeHole();
@@ -417,7 +418,7 @@ public class GolfBall : MonoBehaviour
         }
 
     }
-    
+
 
     private void OnTriggerStay(Collider other)
     {
@@ -445,8 +446,8 @@ public class GolfBall : MonoBehaviour
     {
         return rb.velocity.magnitude < 0.1f && !isRespawning;
     }
-    
-    
+
+
 
     public void ResetBallForNewLevel(Vector3 spawnPosition)
     {
@@ -469,25 +470,25 @@ public class GolfBall : MonoBehaviour
     // stores up power up type and value
 
 
-    public void StorePowerUp(PowerUpType type, float value )
+    public void StorePowerUp(PowerUpType type, float value)
     {
         storedPowerUp = type;
         storedValue = value;
-        if( storedPowerUp == PowerUpType.EmpowerBoost)
+        if (storedPowerUp == PowerUpType.EmpowerBoost)
         {
-             GameManager.Instance.InsertPowerUpText("Empower Shot");
+            GameManager.Instance.InsertPowerUpText("Empower Shot");
         }
-        if( storedPowerUp == PowerUpType.PracticeShot)
+        if (storedPowerUp == PowerUpType.PracticeShot)
         {
-             GameManager.Instance.InsertPowerUpText("Practice Shot");
+            GameManager.Instance.InsertPowerUpText("Practice Shot");
         }
-        if( storedPowerUp == PowerUpType.DoubleShot)
+        if (storedPowerUp == PowerUpType.DoubleShot)
         {
-             GameManager.Instance.InsertPowerUpText("Double Shot");
+            GameManager.Instance.InsertPowerUpText("Double Shot");
         }
-        if( storedPowerUp == PowerUpType.Jeb)
+        if (storedPowerUp == PowerUpType.Jeb)
         {
-             GameManager.Instance.InsertPowerUpText("Jeb");
+            GameManager.Instance.InsertPowerUpText("Jeb");
         }
     }
     // gets rid of power up
@@ -531,6 +532,6 @@ public class GolfBall : MonoBehaviour
     {
         powerMultiplier = 1f;
 
-    
+
     }
 }

@@ -112,6 +112,15 @@ public class GameManager : MonoBehaviour
     {
         powerUpHolder.text = "Empty";
     }
+    public void InsertPowerUpInstruct(string msg)
+    {
+
+        powerUpHolder.text = msg;
+    }
+    public void RemovePowerUpInstruct()
+    {
+        powerUpHolder.text = "Empty";
+    }
     public void RemoveStroke()
     {
         if (strokeCount > 0)
