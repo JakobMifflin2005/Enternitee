@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI holeText;
     public Text powerUpHolder;
 
+    public Text powerUpInstruct;
+
     private int strokeCount = 0;
     private int totalScoreRelativeToPar = 0;
     private List<HoleResult> holeResults = new List<HoleResult>();
@@ -114,13 +116,15 @@ public class GameManager : MonoBehaviour
     }
     public void InsertPowerUpInstruct(string msg)
     {
-
-        powerUpHolder.text = msg;
+    
+        powerUpInstruct.text = msg;
     }
     public void RemovePowerUpInstruct()
     {
-        powerUpHolder.text = "Empty";
+    
+        powerUpInstruct.text = "";
     }
+
     public void RemoveStroke()
     {
         if (strokeCount > 0)
