@@ -11,6 +11,7 @@ public class HoleResult
     public int par;
     public int strokes;
     public int scoreRelativeToPar;
+
     public HoleResult(int holeNumber, int par, int strokes)
     {
         this.holeNumber = holeNumber;
@@ -19,9 +20,10 @@ public class HoleResult
         this.scoreRelativeToPar = strokes - par;
     }
 }
+
 public class GameManager : MonoBehaviour
 {
- int x = 0;
+    //int x = 0;
     public static GameManager Instance;
     [Header("Level Managment")]
     public GameObject[] levels;
@@ -36,7 +38,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI parText;
     public TextMeshProUGUI holeText;
     public Text powerUpHolder;
-    
+
     private int strokeCount = 0;
     private int totalScoreRelativeToPar = 0;
     private List<HoleResult> holeResults = new List<HoleResult>();
@@ -85,9 +87,9 @@ public class GameManager : MonoBehaviour
         currentLevelData = activeLevel.GetComponent<LevelData>();
         strokeCount = 0;
         if (viewCam != null && golfBall != null && currentLevelData != null)
-        { 
-            x =1; 
-            x= 0;
+        {
+            //x = 1;
+            //x = 0;
             viewCam.SetTargets(golfBall.transform, currentLevelData.courseTarget);
         }
         if (golfBall != null)
@@ -103,7 +105,7 @@ public class GameManager : MonoBehaviour
     }
     public void InsertPowerUpText(string msg)
     {
-    
+
         powerUpHolder.text = msg;
     }
     public void RemovePowerUpText()
@@ -112,9 +114,10 @@ public class GameManager : MonoBehaviour
     }
     public void RemoveStroke()
     {
-        if (strokeCount >0){
-        strokeCount--;
-        UpdateUI();
+        if (strokeCount > 0)
+        {
+            strokeCount--;
+            UpdateUI();
         }
     }
     public void ComputeHole()
@@ -154,38 +157,36 @@ public class GameManager : MonoBehaviour
                 totalScoreText.text = "Total: " + totalScoreRelativeToPar;
         }
     }
-    string BuildFinalScorecard()
+    public void ResetGame()
     {
-        string scorecard = "Final Scorecard\n\n";
+        currentLevelIndex = 0;
+        strokeCount = 0;
+        totalScoreRelativeToPar = 0;
+        holeResults.Clear();
 
-        foreach (HoleResult result in holeResults)
+        if (activeLevel != null)
         {
-            string scoreText = result.scoreRelativeToPar > 0
-                ? "+" + result.scoreRelativeToPar
-                : result.scoreRelativeToPar.ToString();
-
-            scorecard += "Hole " + result.holeNumber +
-                         " | Par: " + result.par +
-                         " | Strokes: " + result.strokes +
-                         " | Score: " + scoreText + "\n";
+            Destroy(activeLevel);
         }
 
-        scorecard += "\nTotal Score: ";
-
-        if (totalScoreRelativeToPar > 0)
-            scorecard += "+" + totalScoreRelativeToPar;
-        else
-            scorecard += totalScoreRelativeToPar.ToString();
-
-        return scorecard;
+        LoadLevel(0);
     }
     void EndGame()
     {
         Debug.Log("Game Over!");
         SceneManager.LoadScene("Scoreboard");
     }
-    public string GetFinalScorecard()
+    public List<HoleResult> GetHoleResults()
     {
-        return BuildFinalScorecard();
+        return holeResults;
+    }
+
+    public int GetTotalScore()
+    {
+        return totalScoreRelativeToPar;
+    }
+    public bool DidPlayerWin()
+    {
+        return totalScoreRelativeToPar < 0;
     }
 }
