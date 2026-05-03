@@ -196,6 +196,18 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'Credits:
 
+    Jakob Mifflin
+
+    Nathan Sasser
+
+    Maximus Perez
+
+
+    Music:
+
+    Skylar
+    Northrup
+
 '
 --- !u!222 &399016938
 CanvasRenderer:

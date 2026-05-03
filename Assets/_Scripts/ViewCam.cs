@@ -9,8 +9,8 @@ public class ViewCam : MonoBehaviour
     public float smoothSpeed = 0.1f; // movement smoothness
 
     [Header("Camera Heights")]
-    public float normalHeight = 40f;
-    public float wideShotHeight = 100f;
+    public float normalHeight = 100f;
+    public float wideShotHeight = 150f;
     public float courseViewHeight = 300f;
     [Header("Orthographic Sizes ")]
     public float normalSize = 12f;
